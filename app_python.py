@@ -45,7 +45,7 @@ st.markdown("""
 @st.cache_resource
 def get_db_connection():
     """Initialize SQLite database"""
-    conn = sqlite3.connect('leads.db')
+    conn = sqlite3.connect('leads.db', check_same_thread=False)
     conn.row_factory = sqlite3.Row
 
     cursor = conn.cursor()
@@ -195,21 +195,22 @@ if page == "Dashboard":
                 text=status_counts.values
             )
             fig.update_layout(showlegend=False, height=350)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
         with col2:
             st.subheader("Top Lead Sources")
             source_counts = df['source'].value_counts().head(8)
-            fig = px.barh(
+            fig = px.bar(
                 x=source_counts.values,
                 y=source_counts.index,
+                orientation='h',
                 labels={'x': 'Count', 'y': 'Source'},
                 text=source_counts.values,
                 color=source_counts.values,
                 color_continuous_scale='blues'
             )
             fig.update_layout(showlegend=False, height=350)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
         st.divider()
 
@@ -225,7 +226,7 @@ if page == "Dashboard":
             display_cols = ['name', 'email', 'phone', 'status', 'next_followup', 'notes']
             st.dataframe(
                 upcoming[display_cols].sort_values('next_followup'),
-                use_container_width=True,
+                width='stretch',
                 hide_index=True
             )
         else:
@@ -285,7 +286,7 @@ elif page == "All Leads":
         display_cols = ['name', 'email', 'phone', 'source', 'score', 'status', 'last_contact', 'next_followup', 'notes']
         st.dataframe(
             df_filtered[display_cols],
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
 
@@ -326,7 +327,7 @@ elif page == "Add Lead":
         notes = st.text_area("Notes", placeholder="Any relevant information...", height=80)
 
         # Submit button
-        if st.button("✅ Add Lead", use_container_width=True, type="primary"):
+        if st.button("✅ Add Lead", width='stretch', type="primary"):
             if not name or not email:
                 st.error("⚠️ Please fill in Company Name and Email (required fields)")
             else:
@@ -398,7 +399,7 @@ elif page == "Analytics":
                 labels={'score': 'Lead Score', 'count': 'Number of Leads'}
             )
             fig.update_layout(height=350, showlegend=True)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
         # Conversion Metrics
         with col2:
@@ -440,7 +441,7 @@ elif page == "Analytics":
             title='Bubble size = Lead Quality'
         )
         fig.update_layout(height=450)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         st.info("""
         **How to read this chart:**
@@ -468,7 +469,7 @@ elif page == "Analytics":
 
         st.dataframe(
             source_analysis.sort_values('Hot %', ascending=False),
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
 
