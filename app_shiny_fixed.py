@@ -1,5 +1,4 @@
 from shiny import App, reactive, render, ui
-from shiny.types import FileInfo
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -87,11 +86,13 @@ init_sample_data()
 # SHINY APP
 # ============================================================================
 
-app_ui = ui.page_navbar(
-    ui.nav(
-        "Dashboard",
-        ui.div(
-            ui.h2("📊 Lead Tracker Dashboard"),
+app_ui = ui.page_fluid(
+    ui.h1("📊 Lead Tracker MVP"),
+    ui.navset_tab(
+        # ========== DASHBOARD TAB ==========
+        ui.nav(
+            "Dashboard",
+            ui.br(),
             ui.row(
                 ui.column(3, ui.value_box("Total Leads", ui.output_text("total_leads"), theme="info")),
                 ui.column(3, ui.value_box("🔥 Hot Leads", ui.output_text("hot_leads"), theme="danger")),
@@ -106,27 +107,27 @@ app_ui = ui.page_navbar(
             ui.br(),
             ui.h3("📅 Upcoming Follow-ups (Next 7 Days)"),
             ui.output_table("upcoming_table"),
-            class_="p-4"
-        )
-    ),
-    ui.nav(
-        "All Leads",
-        ui.div(
+        ),
+
+        # ========== ALL LEADS TAB ==========
+        ui.nav(
+            "All Leads",
+            ui.br(),
             ui.h2("📋 Lead Database"),
             ui.row(
-                ui.column(6, ui.input_select("filter_status", "Filter by Status", choices={})),
-                ui.column(6, ui.input_select("filter_source", "Filter by Source", choices={})),
+                ui.column(6, ui.input_select("filter_status", "Filter by Status", choices=[])),
+                ui.column(6, ui.input_select("filter_source", "Filter by Source", choices=[])),
             ),
             ui.br(),
             ui.output_table("all_leads_table"),
             ui.br(),
             ui.download_button("download_leads", "📥 Download as CSV"),
-            class_="p-4"
-        )
-    ),
-    ui.nav(
-        "Add Lead",
-        ui.div(
+        ),
+
+        # ========== ADD LEAD TAB ==========
+        ui.nav(
+            "Add Lead",
+            ui.br(),
             ui.row(
                 ui.column(
                     6,
@@ -170,12 +171,12 @@ app_ui = ui.page_navbar(
                     ui.value_box("Hot %", ui.output_text("hot_pct_add"), theme="danger"),
                 ),
             ),
-            class_="p-4"
-        )
-    ),
-    ui.nav(
-        "Analytics",
-        ui.div(
+        ),
+
+        # ========== ANALYTICS TAB ==========
+        ui.nav(
+            "Analytics",
+            ui.br(),
             ui.h2("📈 Lead Analytics"),
             ui.row(
                 ui.column(6, ui.output_plot("score_distribution")),
@@ -190,11 +191,8 @@ app_ui = ui.page_navbar(
             ui.br(),
             ui.h3("Lead Source Performance"),
             ui.output_table("source_performance"),
-            class_="p-4"
-        )
+        ),
     ),
-    title="Lead Tracker MVP",
-    id="navbar",
 )
 
 def server(input, output, session):
@@ -365,7 +363,7 @@ def server(input, output, session):
             add_lead(name, email, phone, source, score, status, notes)
             refresh_leads()
 
-            # Show success message
+            # Clear form
             ui.update_text("new_name", value="")
             ui.update_text("new_email", value="")
             ui.update_text("new_phone", value="")
